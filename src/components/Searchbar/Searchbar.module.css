@@ -51,8 +51,8 @@
 
 .searchFormButtonLabel {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: 45px;
+  height: 45px;
   padding: 0;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
@@ -70,6 +70,7 @@
   outline: none;
   padding-left: 4px;
   padding-right: 4px;
+  line-height: normal;
 }
 
 .searchFormInput::placeholder {

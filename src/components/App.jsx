@@ -4,6 +4,7 @@ import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
+import { AiOutlineSearch } from 'react-icons/fa';
 
 export default class App extends Component {
   state = {
