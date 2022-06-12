@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { ToastContainer } from 'react-toastify';
+import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
@@ -17,7 +18,7 @@ export default class App extends Component {
       <div
         style={{
           height: '100vh',
-          display: 'flex',
+          // display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           fontSize: 40,
