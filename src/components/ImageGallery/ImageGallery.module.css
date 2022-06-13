@@ -19,3 +19,8 @@
   display: flex;
   justify-content: center;
 }
+.errorMessage{
+  font-size: 30px;
+  color:darkorange;
+  text-align: center;
+}

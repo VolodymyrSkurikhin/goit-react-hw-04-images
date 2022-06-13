@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Modal from 'components/Modal/Modal';
+import PropTypes from 'prop-types';
 import s from './ImageGalleryItem.module.css';
 
 export default class ImageGalleryItem extends Component {
@@ -21,10 +22,23 @@ export default class ImageGalleryItem extends Component {
         />
         {this.state.showModal && (
           <Modal handleModal={this.handleModal}>
-            <img src={item.largeImageURL} alt={item.tags} />
+            <img
+              className={s.largeImg}
+              src={item.largeImageURL}
+              alt={item.tags}
+            />
           </Modal>
         )}
       </li>
     );
   }
 }
+
+ImageGalleryItem.propTypes = {
+  image: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    webformatURL: PropTypes.string.isRequired,
+    largeImageURL: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
+  }),
+};

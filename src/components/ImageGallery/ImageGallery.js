@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem.js';
 import Button from '../Button/Button.js';
 import { Puff } from 'react-loader-spinner';
+import PropTypes from 'prop-types';
 import s from './ImageGallery.module.css';
 
 export default class ImageGallery extends Component {
@@ -25,12 +26,17 @@ export default class ImageGallery extends Component {
       this.setState({ status: 'pending' });
       this.loadImages(this.props.search, page)
         .then(response => {
+          if (response.hits.length === 0) {
+            return Promise.reject(
+              new Error(`No images of ${this.props.search}, sorry`)
+            );
+          }
           this.setState(prevState => ({
             images: [...prevState.images, ...response.hits],
             status: 'resolved',
             hits: response.hits.length,
           }));
-          console.dir(response.hits);
+          console.log(response.hits.length);
         })
         .catch(error => this.setState({ error, status: 'error' }));
     }
@@ -39,9 +45,10 @@ export default class ImageGallery extends Component {
     const URL = `https://pixabay.com/api/?key=26793490-dae10d4013ec617276bbdd3a4&image_type=photo&orientation=horizontal&per_page=12`;
     return fetch(`${URL}&q=${entry}&page=${page}`).then(res => {
       if (res.ok) {
+        // if (res.json().hits.length !== 0) {
         return res.json();
       }
-      return Promise.reject(new Error(`No images of ${entry},sorry`));
+      return Promise.reject(new Error(`No images of ${entry}, sorry`));
     });
   }
   onClickButton = () => {
@@ -74,7 +81,11 @@ export default class ImageGallery extends Component {
       );
     }
     if (this.state.status === 'error') {
-      return <h1>{this.state.error.message}</h1>;
+      return <h1 className={s.errorMessage}>{this.state.error.message}</h1>;
     }
   }
 }
+
+ImageGallery.propTypes = {
+  search: PropTypes.string,
+};
