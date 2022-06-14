@@ -35,6 +35,7 @@ export default class ImageGallery extends Component {
             images: [...prevState.images, ...response.hits],
             status: 'resolved',
             hits: response.hits.length,
+            showLoader: !prevState.showLoader,
           }));
           console.log(response.hits.length);
         })
@@ -45,7 +46,6 @@ export default class ImageGallery extends Component {
     const URL = `https://pixabay.com/api/?key=26793490-dae10d4013ec617276bbdd3a4&image_type=photo&orientation=horizontal&per_page=12`;
     return fetch(`${URL}&q=${entry}&page=${page}`).then(res => {
       if (res.ok) {
-        // if (res.json().hits.length !== 0) {
         return res.json();
       }
       return Promise.reject(new Error(`No images of ${entry}, sorry`));
@@ -59,30 +59,28 @@ export default class ImageGallery extends Component {
     if (this.state.status === 'idle') {
       return <p>waiting for search...</p>;
     }
-    if (this.state.status === 'pending') {
-      return (
-        <div className={s.loader}>
-          <Puff color="#00BFFF" height={80} width={80} />
-        </div>
-      );
+    if (this.state.status === 'error') {
+      return <h1 className={s.errorMessage}>{this.state.error.message}</h1>;
     }
-    if (this.state.status === 'resolved') {
-      console.log(this.state.images);
-      return (
+    return (
+      <>
+        {this.state.status === 'pending' && (
+          <div className={s.loader}>
+            <Puff color="#00BFFF" height={80} width={80} />
+          </div>
+        )}
         <div className={s.container}>
           <ul className={s.imageGallery}>
             {this.state.images.map(image => (
               <ImageGalleryItem image={image} key={image.id} />
             ))}
           </ul>
-
-          {this.state.hits >= 12 && <Button onClick={this.onClickButton} />}
+          {this.state.hits >= 12 && this.state.status === 'resolved' && (
+            <Button onClick={this.onClickButton} />
+          )}
         </div>
-      );
-    }
-    if (this.state.status === 'error') {
-      return <h1 className={s.errorMessage}>{this.state.error.message}</h1>;
-    }
+      </>
+    );
   }
 }
 
