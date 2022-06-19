@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import s from './Modal.module.css';
@@ -6,21 +6,19 @@ import s from './Modal.module.css';
 const modalRoot = document.getElementById('modal-root');
 
 export default function Modal({ handleModal, children }) {
-  // componentDidMount() {
-  //   window.addEventListener('keydown', this.handleKeyDown);
-  // }
-  // componentWillUnmount() {
-  //   window.removeEventListener('keydown', this.handleKeyDown);
-  // }
+  const handleKeyDown = useCallback(
+    e => {
+      if (e.code === 'Escape') {
+        handleModal();
+      }
+    },
+    [handleModal]
+  );
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-  const handleKeyDown = e => {
-    if (e.code === 'Escape') {
-      handleModal();
-    }
-  };
+  }, [handleKeyDown]);
+
   const handleBackDropClick = e => {
     if (e.currentTarget === e.target) {
       handleModal();

@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Modal from 'components/Modal/Modal';
 import PropTypes from 'prop-types';
 import s from './ImageGalleryItem.module.css';
 
 export default function ImageGalleryItem({ image }) {
-  // state = {
-  //   showModal: false,
-  // };
   const [showModal, setShowModal] = useState(false);
-  const handleModal = () => setShowModal(prevState => !prevState);
+  const handleModal = useCallback(
+    () => setShowModal(prevState => !prevState),
+    [setShowModal]
+  );
   const item = image;
   return (
     <li className={s.imageGalleryItem}>

@@ -5,30 +5,19 @@ import { Puff } from 'react-loader-spinner';
 import PropTypes from 'prop-types';
 import s from './ImageGallery.module.css';
 
-export default function ImageGallery({ search }) {
+export default function ImageGallery({ search, setPage, page }) {
   const [images, setImages] = useState([]);
-  const [page, setPage] = useState(1);
   const [error, setError] = useState('');
   const [hits, setHits] = useState(0);
   const [status, setStatus] = useState('idle');
-  const [loadedSearch, setLoadedSearch] = useState('');
-  const [loadedPage, setLoadedPage] = useState();
 
   useEffect(() => {
-    setPage(1);
     setImages([]);
   }, [search]);
   useEffect(() => {
     if (search === '') {
-      setPage(1);
       setImages([]);
       setStatus('idle');
-      return;
-    }
-    if (loadedSearch !== search && page !== 1) {
-      return;
-    }
-    if (loadedSearch === search && loadedPage === page) {
       return;
     }
     setStatus('pending');
@@ -37,8 +26,6 @@ export default function ImageGallery({ search }) {
         if (response.hits.length === 0) {
           return Promise.reject(new Error(`No images of ${search}, sorry`));
         }
-        setLoadedSearch(search);
-        setLoadedPage(page);
         setImages(prevState => [...prevState, ...response.hits]);
         setStatus('resolved');
         setHits(response.hits.length);
@@ -49,7 +36,7 @@ export default function ImageGallery({ search }) {
         setError('error');
         setStatus('status');
       });
-  }, [page, search, loadedSearch, loadedPage]);
+  }, [page, search]);
 
   function loadImages(entry, pageP) {
     const URL = `https://pixabay.com/api/?key=26793490-dae10d4013ec617276bbdd3a4&image_type=photo&orientation=horizontal&per_page=12`;

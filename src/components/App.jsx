@@ -9,9 +9,13 @@ export default function App() {
   // state = {
   //   search: '',
   // };
+  const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
-  const handlSearch = search => setSearch(search);
+  const handlSearch = search => {
+    setSearch(search);
+    setPage(1);
+  };
 
   return (
     <div
@@ -25,7 +29,7 @@ export default function App() {
       }}
     >
       <Searchbar onSubmit={handlSearch} />
-      <ImageGallery search={search} />
+      <ImageGallery search={search} setPage={setPage} page={page} />
       <ToastContainer autoClose={3000} />
     </div>
   );
