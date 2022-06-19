@@ -1,87 +1,92 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem.js';
 import Button from '../Button/Button.js';
 import { Puff } from 'react-loader-spinner';
 import PropTypes from 'prop-types';
 import s from './ImageGallery.module.css';
 
-export default class ImageGallery extends Component {
-  state = {
-    images: [],
-    page: 1,
-    error: '',
-    hits: 0,
-    status: 'idle',
-  };
-  componentDidUpdate(prevProps, prevState) {
-    let page = this.state.page;
-    if (prevProps.search !== this.props.search) {
-      this.setState({ page: 1, images: [] });
-      page = 1;
+export default function ImageGallery({ search }) {
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [error, setError] = useState('');
+  const [hits, setHits] = useState(0);
+  const [status, setStatus] = useState('idle');
+  const [loadedSearch, setLoadedSearch] = useState('');
+  const [loadedPage, setLoadedPage] = useState();
+
+  useEffect(() => {
+    setPage(1);
+    setImages([]);
+  }, [search]);
+  useEffect(() => {
+    if (search === '') {
+      setPage(1);
+      setImages([]);
+      setStatus('idle');
+      return;
     }
-    if (
-      prevProps.search !== this.props.search ||
-      prevState.page < this.state.page
-    ) {
-      this.setState({ status: 'pending' });
-      this.loadImages(this.props.search, page)
-        .then(response => {
-          if (response.hits.length === 0) {
-            return Promise.reject(
-              new Error(`No images of ${this.props.search}, sorry`)
-            );
-          }
-          this.setState(prevState => ({
-            images: [...prevState.images, ...response.hits],
-            status: 'resolved',
-            hits: response.hits.length,
-            showLoader: !prevState.showLoader,
-          }));
-          console.log(response.hits.length);
-        })
-        .catch(error => this.setState({ error, status: 'error' }));
+    if (loadedSearch !== search && page !== 1) {
+      return;
     }
-  }
-  loadImages(entry, page) {
+    if (loadedSearch === search && loadedPage === page) {
+      return;
+    }
+    setStatus('pending');
+    loadImages(search, page)
+      .then(response => {
+        if (response.hits.length === 0) {
+          return Promise.reject(new Error(`No images of ${search}, sorry`));
+        }
+        setLoadedSearch(search);
+        setLoadedPage(page);
+        setImages(prevState => [...prevState, ...response.hits]);
+        setStatus('resolved');
+        setHits(response.hits.length);
+        // showLoader: !prevState.showLoader,
+        console.log(response.hits.length);
+      })
+      .catch(error => {
+        setError('error');
+        setStatus('status');
+      });
+  }, [page, search, loadedSearch, loadedPage]);
+
+  function loadImages(entry, pageP) {
     const URL = `https://pixabay.com/api/?key=26793490-dae10d4013ec617276bbdd3a4&image_type=photo&orientation=horizontal&per_page=12`;
-    return fetch(`${URL}&q=${entry}&page=${page}`).then(res => {
+    return fetch(`${URL}&q=${entry}&page=${pageP}`).then(res => {
       if (res.ok) {
         return res.json();
       }
       return Promise.reject(new Error(`No images of ${entry}, sorry`));
     });
   }
-  onClickButton = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
-  };
+  const onClickButton = () => setPage(prevState => prevState + 1);
 
-  render() {
-    if (this.state.status === 'idle') {
-      return <p>waiting for search...</p>;
-    }
-    if (this.state.status === 'error') {
-      return <h1 className={s.errorMessage}>{this.state.error.message}</h1>;
-    }
-    return (
-      <>
-        {this.state.status === 'pending' && (
-          <div className={s.loader}>
-            <Puff color="#00BFFF" height={80} width={80} />
-          </div>
-        )}
-        <div className={s.container}>
-          <ul className={s.imageGallery}>
-            {this.state.images.map(image => (
-              <ImageGalleryItem image={image} key={image.id} />
-            ))}
-          </ul>
-          {this.state.hits >= 12 && this.state.status === 'resolved' && (
-            <Button onClick={this.onClickButton} />
-          )}
-        </div>
-      </>
-    );
+  if (status === 'idle') {
+    return <p>waiting for search...</p>;
   }
+  if (status === 'error') {
+    return <h1 className={s.errorMessage}>{error.message}</h1>;
+  }
+  return (
+    <>
+      {status === 'pending' && (
+        <div className={s.loader}>
+          <Puff color="#00BFFF" height={80} width={80} />
+        </div>
+      )}
+      <div className={s.container}>
+        <ul className={s.imageGallery}>
+          {images.map(image => (
+            <ImageGalleryItem image={image} key={image.id} />
+          ))}
+        </ul>
+        {hits >= 12 && status === 'resolved' && (
+          <Button onClick={onClickButton} />
+        )}
+      </div>
+    </>
+  );
 }
 
 ImageGallery.propTypes = {
